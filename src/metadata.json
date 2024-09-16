@@ -1,0 +1,7 @@
+{
+  "name": "Cloudflare WARP",
+  "description": "Adds Cloudflare WARP quick settings to the Gnome Shell",
+  "uuid": "cloudflare-warp@naueramant.github.com",
+  "url": "https://github.com/naueramant/gnome-cloudflare-warp",
+  "shell-version": ["46", "47"]
+}

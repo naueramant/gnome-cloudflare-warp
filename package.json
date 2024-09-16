@@ -1,0 +1,17 @@
+{
+  "name": "gnome-cloudflare-warp",
+  "version": "1.0.0",
+  "license": "LGPL-3.0-or-later",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "author": "Jonas Tranberg",
+  "devDependencies": {
+    "eslint": "^9.10.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.3.3"
+  }
+}
