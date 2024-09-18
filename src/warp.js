@@ -8,6 +8,12 @@ export const State = {
   CONNECTING: 4,
 };
 
+export class Settings {
+  constructor(organization) {
+    this.organization = organization;
+  }
+}
+
 export class VNet {
   constructor(id, name, isDefault, isSelected) {
     this.id = id;
