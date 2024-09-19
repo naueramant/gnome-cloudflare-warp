@@ -5,13 +5,15 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "build": "zip-build --template %NAME%.%EXT% --override src ./build"
   },
   "author": "Jonas Tranberg",
   "devDependencies": {
     "eslint": "^9.10.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "zip-build": "^1.8.0"
   }
 }
