@@ -2,9 +2,9 @@
 
 A Gnome shell extension that allows you to quickly enable and disable Cloudflare WARP and change the Virtual Network from the Quick Settings menu.
 
-<center>
+<p align="center">
   <img src="./assets/screenshot.png" alt="Screenshot" width="300">
-</center>
+</p>
 
 ## Installation
 
