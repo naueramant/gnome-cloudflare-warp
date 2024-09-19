@@ -19,6 +19,7 @@ To install the extension, follow these steps:
    ```
 
 3. Run the install script:
+
    ```bash
    ./install.sh
    ```

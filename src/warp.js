@@ -140,7 +140,9 @@ export class Client {
 
       const lines = stdout.split("\n");
 
-      const currentlySelected = lines[1].split(": ")[1];
+      const currentlySelected = lines[1]
+        .split("Currently selected: ")[1]
+        .trim();
 
       let id = null;
       let name = null;
@@ -148,11 +150,12 @@ export class Client {
 
       for (let line of lines) {
         if (line.startsWith("ID: ")) {
-          id = line.split(": ")[1];
+          id = line.split("ID: ")[1].trim();
         } else if (line.startsWith("Name: ")) {
-          name = line.split(": ")[1];
+          name = line.split("Name: ")[1].trim();
+          name = name.replace(/-vnet$/, "");
         } else if (line.startsWith("Default: ")) {
-          isDefault = line.split(": ")[1] === "true";
+          isDefault = line.split("Default: ")[1].trim() === "true";
           virtualNetworks.push(
             new VNet(id, name, isDefault, id === currentlySelected),
           );
