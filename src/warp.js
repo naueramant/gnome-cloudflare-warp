@@ -42,8 +42,11 @@ export class Client {
   statusPattern =
     /(Connected|Connecting|Disconnected|Registration Missing|No Network)/;
 
-  virtualNetworksRefreshInterval = 5000;
-  stateRefreshInterval = 1000;
+  backgroundVirtualNetworksRefreshInterval = 5000;
+  backgroundStateRefreshInterval = 5000;
+
+  quickStateRefreshInterval = 500;
+  quickStateTimeout = 10000;
 
   state = State.UNKNOWN;
   vnets = [];
@@ -63,17 +66,25 @@ export class Client {
   */
 
   async connect() {
+    this._stopPollingIntervals();
+
     await this._setState(State.CONNECTING);
     await execute("warp-cli", ["connect"]);
 
-    await this._getState();
+    await this._waitForState(State.CONNECTED);
+
+    this._startPollingIntervals();
   }
 
   async disconnect() {
+    this._stopPollingIntervals();
+
     await this._setState(State.DISCONNECTED);
     await execute("warp-cli", ["disconnect"]);
 
-    await this._getState();
+    await this._waitForState(State.DISCONNECTED);
+
+    this._startPollingIntervals();
   }
 
   async toggle() {
@@ -91,11 +102,19 @@ export class Client {
 
     await this._setState(State.CONNECTING);
 
+    await this._setVirtualNetworks(
+      this.vnets.map((vnet) => {
+        return new VNet(vnet.id, vnet.name, vnet.default, vnet.id === id);
+      }),
+    );
+
     await execute("warp-cli", ["vnet", id]);
 
     if (isDisconnected) {
-      await this.connect();
+      await execute("warp-cli", ["connect"]);
     }
+
+    await this._waitForState(State.CONNECTED);
 
     this._startPollingIntervals();
   }
@@ -120,11 +139,11 @@ export class Client {
 
     this.vnetInterval = setInterval(() => {
       this._getVirtualNetworks();
-    }, this.virtualNetworksRefreshInterval);
+    }, this.backgroundVirtualNetworksRefreshInterval);
 
     this.stateInterval = setInterval(() => {
       this._getState();
-    }, this.stateRefreshInterval);
+    }, this.backgroundStateRefreshInterval);
   }
 
   _stopPollingIntervals() {
@@ -210,6 +229,26 @@ export class Client {
 
     for (let cb of this.vnetEventListeners) {
       cb(vnets);
+    }
+  }
+
+  async _waitForState(state) {
+    const start = Date.now();
+
+    while (this.state !== state) {
+      await this._getState();
+
+      if (this.state === state) {
+        return true;
+      }
+
+      if (Date.now() - start > this.quickStateTimeout) {
+        return false;
+      }
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, this.quickStateRefreshInterval),
+      );
     }
   }
 }
