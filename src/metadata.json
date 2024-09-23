@@ -1,6 +1,6 @@
 {
   "name": "Cloudflare WARP",
-  "description": "Adds Cloudflare WARP quick settings to the Gnome Shell",
+  "description": "Adds Cloudflare WARP quick settings to the Gnome Shell.\n\nThis extension is not affiliated, funded, or in any way associated with Cloudflare.",
   "uuid": "cloudflare-warp@naueramant.github.com",
   "url": "https://github.com/naueramant/gnome-cloudflare-warp",
   "shell-version": ["46", "47"]
