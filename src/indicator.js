@@ -10,7 +10,7 @@ export const WarpIndicator = GObject.registerClass(
     constructor(extensionObject) {
       super();
 
-      extensionObject.warpClient = new Warp.Client();
+      this._warpClient = new Warp.Client();
 
       // Indicator
 
@@ -20,7 +20,7 @@ export const WarpIndicator = GObject.registerClass(
       );
       this._indicator.visible = false;
 
-      extensionObject.warpClient.onStateChange((state) => {
+      this._warpClient.onStateChange((state) => {
         let icon = getStateIcon(state);
 
         this._indicator.gicon = Gio.icon_new_for_string(
@@ -35,13 +35,21 @@ export const WarpIndicator = GObject.registerClass(
 
       // Quick setting
 
-      const toggle = new WarpMenuToggle(extensionObject);
+      const toggle = new WarpMenuToggle(extensionObject, this._warpClient);
 
       toggle.connect("clicked", () => {
-        extensionObject.warpClient.toggle();
+        this._warpClient.toggle();
       });
 
       this.quickSettingsItems.push(toggle);
+    }
+
+    destroy() {
+      this._warpClient.destroy();
+      this._warpClient = null;
+
+      this.quickSettingsItems.forEach((item) => item.destroy());
+      super.destroy();
     }
   },
 );

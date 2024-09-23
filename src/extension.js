@@ -9,7 +9,7 @@ export default class WarpExtension extends Extension {
   }
 
   disable() {
-    this._indicator.quickSettingsItems.forEach((item) => item.destroy());
     this._indicator.destroy();
+    this._indicator = null;
   }
 }

@@ -8,7 +8,7 @@ import { getStateIcon } from "./icon.js";
 
 export const WarpMenuToggle = GObject.registerClass(
   class WarpMenuToggle extends QuickMenuToggle {
-    _init(extensionObject) {
+    _init(extensionObject, warpClient) {
       super._init({
         title: _("WARP"),
         subtitle: _(""),
@@ -21,6 +21,7 @@ export const WarpMenuToggle = GObject.registerClass(
       this._extensionObject = extensionObject;
       this._items = new Map();
 
+      this._warpClient = warpClient;
       this._selectedVirtualNetwork = "";
 
       // Menu header
@@ -40,7 +41,7 @@ export const WarpMenuToggle = GObject.registerClass(
     }
 
     _subscribeToStateChange() {
-      this._extensionObject.warpClient.onStateChange((state) => {
+      this._warpClient.onStateChange((state) => {
         this.checked = state === Warp.State.CONNECTED;
 
         let stateText = Warp.stateToString(state);
@@ -62,7 +63,7 @@ export const WarpMenuToggle = GObject.registerClass(
     }
 
     _subscribeToVirtualNetworksChange() {
-      this._extensionObject.warpClient.onVirtualNetworksChange((vnets) => {
+      this._warpClient.onVirtualNetworksChange((vnets) => {
         this._removeMenuItems();
 
         vnets.forEach((vnet) => {
@@ -78,7 +79,7 @@ export const WarpMenuToggle = GObject.registerClass(
     _addMenuItem(vnet) {
       const item = new PopupMenu.PopupMenuItem(vnet.name);
       item.connect("activate", () => {
-        this._extensionObject.warpClient.setVirtualNetwork(vnet.id);
+        this._warpClient.setVirtualNetwork(vnet.id);
       });
 
       if (vnet.selected) {
@@ -95,6 +96,11 @@ export const WarpMenuToggle = GObject.registerClass(
       });
 
       this._items.clear();
+    }
+
+    destroy() {
+      this._removeMenuItems();
+      super.destroy();
     }
   },
 );

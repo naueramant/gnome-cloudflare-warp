@@ -54,8 +54,10 @@ export class Client {
   vnetEventListeners = [];
   stateEventListeners = [];
 
-  vnetInterval = null;
-  stateInterval = null;
+  vnetIntervalId = null;
+  stateIntervalId = null;
+
+  timeoutId = null;
 
   constructor() {
     this._startPollingIntervals();
@@ -129,6 +131,11 @@ export class Client {
     this.vnetEventListeners.push(cb);
   }
 
+  destroy() {
+    this._clearTimeout();
+    this._stopPollingIntervals();
+  }
+
   /*
       private methods
   */
@@ -137,18 +144,21 @@ export class Client {
     this._getState();
     this._getVirtualNetworks();
 
-    this.vnetInterval = setInterval(() => {
+    this.vnetIntervalId = setInterval(() => {
       this._getVirtualNetworks();
     }, this.backgroundVirtualNetworksRefreshInterval);
 
-    this.stateInterval = setInterval(() => {
+    this.stateIntervalId = setInterval(() => {
       this._getState();
     }, this.backgroundStateRefreshInterval);
   }
 
   _stopPollingIntervals() {
-    clearInterval(this.vnetInterval);
-    clearInterval(this.stateInterval);
+    clearInterval(this.vnetIntervalId);
+    this.vnetIntervalId = null;
+
+    clearInterval(this.stateIntervalId);
+    this.stateIntervalId = null;
   }
 
   async _getVirtualNetworks() {
@@ -186,6 +196,11 @@ export class Client {
     }
 
     await this._setVirtualNetworks(virtualNetworks);
+  }
+
+  async _clearTimeout() {
+    clearTimeout(this.timeoutId);
+    this.timeoutId = null;
   }
 
   async _getState() {
@@ -246,8 +261,12 @@ export class Client {
         return false;
       }
 
-      await new Promise((resolve) =>
-        setTimeout(resolve, this.quickStateRefreshInterval),
+      await new Promise(
+        (resolve) =>
+          (this.timeoutId = setTimeout(
+            resolve,
+            this.quickStateRefreshInterval,
+          )),
       );
     }
   }
